@@ -1,475 +1,386 @@
-
-import React from "react";
+import React from 'react';
 import {
+  SafeAreaView,
   View,
   Text,
-  TextInput,
-  ScrollView,
+  FlatList,
   TouchableOpacity,
   StyleSheet,
   StatusBar,
-} from "react-native";
+  ScrollView,
+} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-const notes = [
+// ==========================================
+// 1. HARDCODED MOCK DATA
+// ==========================================
+const RECIPES_DATA = [
   {
-    title: "Programming Languages",
-    subject: "CS302",
-    date: "Today, 10:30 AM",
-    description:
-      "Syntax, semantics, data types, control flow, and abstractions.",
-    color: "#E6F0FF",
+    id: '1',
+    name: 'Chicken Adobo',
+    category: 'Filipino',
+    prepTime: '45 mins',
+    servings: 4,
+    description: 'A savory Filipino classic dish braised in soy sauce, vinegar, garlic, and black pepper.',
+    ingredients: [
+      '1 kg Chicken thighs',
+      '1/2 cup Soy sauce',
+      '1/2 cup Vinegar',
+      '5 cloves Garlic, crushed',
+      '2 Bay leaves',
+      '1 tsp Whole black peppercorns',
+    ],
   },
   {
-    title: "Automata Theory",
-    subject: "CS303",
-    date: "Yesterday",
-    description:
-      "Review DFA, NFA, regular expressions, and finite automata.",
-    color: "#E9F6FF",
+    id: '2',
+    name: 'Garlic Butter Shrimp',
+    category: 'Seafood',
+    prepTime: '20 mins',
+    servings: 2,
+    description: 'Quick and rich shrimp sautéed in minced garlic, melted butter, and fresh lemon juice.',
+    ingredients: [
+      '500g Large shrimp, peeled',
+      '1/2 cup Unsalted butter',
+      '1 head Garlic, minced',
+      '1 tbsp Lemon juice',
+      'Fresh parsley, chopped',
+    ],
   },
   {
-    title: "Software Engineering",
-    subject: "CSElec 1",
-    date: "Sep 25, 2026",
-    description:
-      "Software development life cycle, requirements, and system design.",
-    color: "#EAF3FF",
+    id: '3',
+    name: 'Spaghetti Carbonara',
+    category: 'Italian',
+    prepTime: '25 mins',
+    servings: 3,
+    description: 'Authentic Roman pasta prepared with crispy pancetta, fresh egg yolks, Pecorino Romano, and black pepper.',
+    ingredients: [
+      '350g Spaghetti',
+      '150g Pancetta or Guanciale',
+      '3 Large egg yolks',
+      '1 cup Pecorino Romano cheese',
+      'Freshly ground black pepper',
+    ],
   },
 ];
 
-export default function App() {
+// ==========================================
+// 2. SCREEN 1: HOME SCREEN
+// ==========================================
+function HomeScreen({ navigation }) {
   return (
-    <View style={styles.container}>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="#1769E0"
-      />
+    <SafeAreaView style={styles.container}>
+      <View style={styles.centerContent}>
+        <Text style={styles.homeEmoji}>🍳</Text>
+        <Text style={styles.homeTitle}>Recipe Book</Text>
+        <Text style={styles.homeSubtitle}>
+          Discover delicious home-cooked meals and step-by-step guides.
+        </Text>
 
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>Good evening 👋</Text>
-          <Text style={styles.headerTitle}>My Study Notes</Text>
-          <Text style={styles.subtitle}>
-            Keep your learning organized.
-          </Text>
-        </View>
-
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>OL</Text>
-        </View>
-      </View>
-
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
-      >
-        <View style={styles.searchBox}>
-          <Text style={styles.searchIcon}>⌕</Text>
-          <TextInput
-            placeholder="Search your notes..."
-            placeholderTextColor="#8A9AB5"
-            style={styles.searchInput}
-          />
-        </View>
-
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Categories</Text>
-          <Text style={styles.seeAll}>See all</Text>
-        </View>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.categories}
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={() => navigation.navigate('RecipeList')}
         >
-          <TouchableOpacity
-            style={[styles.category, styles.activeCategory]}
-          >
-            <Text style={styles.categoryEmoji}>📚</Text>
-            <Text style={styles.activeCategoryText}>All Notes</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.category}>
-            <Text style={styles.categoryEmoji}>💻</Text>
-            <Text style={styles.categoryText}>Programming</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.category}>
-            <Text style={styles.categoryEmoji}>🧠</Text>
-            <Text style={styles.categoryText}>Theory</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.category}>
-            <Text style={styles.categoryEmoji}>📋</Text>
-            <Text style={styles.categoryText}>Projects</Text>
-          </TouchableOpacity>
-        </ScrollView>
-
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Recent Notes</Text>
-          <Text style={styles.noteCount}>03 notes</Text>
-        </View>
-
-        {notes.map((note, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.noteCard}
-            activeOpacity={0.8}
-          >
-            <View style={styles.noteTop}>
-              <View
-                style={[
-                  styles.subjectBadge,
-                  { backgroundColor: note.color },
-                ]}
-              >
-                <Text style={styles.subjectText}>
-                  {note.subject}
-                </Text>
-              </View>
-              <Text style={styles.more}>•••</Text>
-            </View>
-
-            <Text style={styles.noteTitle}>{note.title}</Text>
-
-            <Text style={styles.noteDescription} numberOfLines={2}>
-              {note.description}
-            </Text>
-
-            <View style={styles.noteBottom}>
-              <Text style={styles.date}>◷ {note.date}</Text>
-              <Text style={styles.openNote}>Open →</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-
-        <View style={styles.progressCard}>
-          <View style={styles.progressInfo}>
-            <Text style={styles.progressLabel}>
-              YOUR STUDY PROGRESS
-            </Text>
-            <Text style={styles.progressTitle}>
-              Keep learning! 🚀
-            </Text>
-            <Text style={styles.progressDescription}>
-              You've reviewed 8 notes this week.
-            </Text>
-          </View>
-
-          <View style={styles.progressCircle}>
-            <Text style={styles.progressNumber}>75%</Text>
-          </View>
-        </View>
-
-        <View style={{ height: 100 }} />
-      </ScrollView>
-
-      <TouchableOpacity style={styles.addButton}>
-        <Text style={styles.addIcon}>+</Text>
-        <Text style={styles.addText}>New Note</Text>
-      </TouchableOpacity>
-
-      <View style={styles.bottomNav}>
-        <View style={styles.navItem}>
-          <Text style={styles.navIconActive}>⌂</Text>
-          <Text style={styles.navTextActive}>Notes</Text>
-        </View>
-
-        <View style={styles.navItem}>
-          <Text style={styles.navIcon}>✓</Text>
-          <Text style={styles.navText}>Tasks</Text>
-        </View>
-
-        <View style={styles.navItem}>
-          <Text style={styles.navIcon}>▣</Text>
-          <Text style={styles.navText}>Subjects</Text>
-        </View>
-
-        <View style={styles.navItem}>
-          <Text style={styles.navIcon}>⚙</Text>
-          <Text style={styles.navText}>Settings</Text>
-        </View>
+          <Text style={styles.primaryButtonText}>View All Recipes →</Text>
+        </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
+// ==========================================
+// 3. SCREEN 2: RECIPE CATALOG / LIST SCREEN
+// ==========================================
+function RecipeListScreen({ navigation }) {
+  const renderRecipeCard = ({ item }) => (
+    <TouchableOpacity
+      style={styles.card}
+      activeOpacity={0.8}
+      onPress={() =>
+        // Passing data object to Detail Screen via route.params
+        navigation.navigate('RecipeDetail', { recipe: item })
+      }
+    >
+      <View style={styles.cardHeader}>
+        <Text style={styles.cardTitle}>{item.name}</Text>
+        <Text style={styles.badge}>{item.category}</Text>
+      </View>
+
+      <Text style={styles.cardDescription} numberOfLines={2}>
+        {item.description}
+      </Text>
+
+      <View style={styles.cardFooter}>
+        <Text style={styles.cardMeta}>⏱️ {item.prepTime}</Text>
+        <Text style={styles.cardMeta}>🍽️ {item.servings} Servings</Text>
+        <Text style={styles.viewLink}>View Details →</Text>
+      </View>
+    </TouchableOpacity>
+  );
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.sectionTitle}>Recipe Collection</Text>
+        <Text style={styles.sectionSubtitle}>Tap any recipe to view full ingredients</Text>
+      </View>
+
+      <FlatList
+        data={RECIPES_DATA}
+        keyExtractor={(item) => item.id}
+        renderItem={renderRecipeCard}
+        contentContainerStyle={styles.listPadding}
+      />
+    </SafeAreaView>
+  );
+}
+
+// ==========================================
+// 4. SCREEN 3: ITEM DETAILS SCREEN
+// ==========================================
+function RecipeDetailScreen({ route, navigation }) {
+  // Receiving the recipe parameters passed from RecipeListScreen
+  const { recipe } = route.params;
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.detailPadding}>
+        <Text style={styles.detailTitle}>{recipe.name}</Text>
+        
+        <View style={styles.metaRow}>
+          <Text style={styles.badge}>{recipe.category}</Text>
+          <Text style={styles.detailMetaText}>⏱️ {recipe.prepTime}</Text>
+          <Text style={styles.detailMetaText}>🍽️ {recipe.servings} Servings</Text>
+        </View>
+
+        <Text style={styles.sectionHeader}>Description</Text>
+        <Text style={styles.detailDescription}>{recipe.description}</Text>
+
+        <Text style={styles.sectionHeader}>Ingredients</Text>
+        <View style={styles.ingredientsBox}>
+          {recipe.ingredients.map((ingredient, index) => (
+            <Text key={index} style={styles.ingredientItem}>
+              •  {ingredient}
+            </Text>
+          ))}
+        </View>
+
+        {/* Custom Go Back Button demonstrating navigation.goBack() */}
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.backButtonText}>← Go Back to Collection</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+// ==========================================
+// 5. STACK NAVIGATOR CONFIGURATION
+// ==========================================
+const Stack = createNativeStackNavigator();
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <StatusBar barStyle="dark-content" />
+      <Stack.Navigator
+        initialRouteName="Home"
+        screenOptions={{
+          headerTintColor: '#E85D04',
+          headerTitleStyle: { fontWeight: 'bold' },
+        }}
+      >
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ title: 'Welcome' }}
+        />
+        <Stack.Screen
+          name="RecipeList"
+          component={RecipeListScreen}
+          options={{ title: 'Recipes' }}
+        />
+        <Stack.Screen
+          name="RecipeDetail"
+          component={RecipeDetailScreen}
+          options={({ route }) => ({
+            title: route.params?.recipe?.name || 'Recipe Details',
+          })}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+// ==========================================
+// 6. STYLES
+// ==========================================
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F4F7FC",
+    backgroundColor: '#F8F9FA',
   },
-  header: {
-    backgroundColor: "#1769E0",
-    paddingHorizontal: 22,
-    paddingTop: 48,
-    paddingBottom: 26,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderBottomLeftRadius: 26,
-    borderBottomRightRadius: 26,
+  centerContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
   },
-  greeting: {
-    color: "#D9E9FF",
-    fontSize: 14,
-    marginBottom: 5,
+  homeEmoji: {
+    fontSize: 64,
+    marginBottom: 16,
   },
-  headerTitle: {
-    color: "#FFFFFF",
-    fontSize: 25,
-    fontWeight: "800",
+  homeTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#212529',
+    marginBottom: 8,
   },
-  subtitle: {
-    color: "#D9E9FF",
-    fontSize: 12,
-    marginTop: 6,
+  homeSubtitle: {
+    fontSize: 16,
+    color: '#6C757D',
+    textAlign: 'center',
+    marginBottom: 32,
+    lineHeight: 22,
   },
-  avatar: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    backgroundColor: "#FFFFFF",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  avatarText: {
-    color: "#1769E0",
-    fontSize: 15,
-    fontWeight: "800",
-  },
-  content: {
-    padding: 20,
-  },
-  searchBox: {
-    height: 52,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 15,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 15,
-    marginBottom: 25,
+  primaryButton: {
+    backgroundColor: '#E85D04',
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    borderRadius: 10,
     elevation: 2,
   },
-  searchIcon: {
-    fontSize: 25,
-    color: "#1769E0",
-    marginRight: 10,
+  primaryButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    color: "#24344D",
-  },
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 13,
+  headerContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
   },
   sectionTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#212529',
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    color: '#6C757D',
+    marginTop: 2,
+  },
+  listPadding: {
+    padding: 16,
+  },
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: '#E9ECEF',
+    elevation: 1,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  cardTitle: {
     fontSize: 18,
-    fontWeight: "800",
-    color: "#172B4D",
-  },
-  seeAll: {
-    color: "#1769E0",
-    fontSize: 13,
-    fontWeight: "700",
-  },
-  noteCount: {
-    color: "#8291A8",
-    fontSize: 12,
-  },
-  categories: {
-    marginBottom: 25,
-  },
-  category: {
-    backgroundColor: "#FFFFFF",
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    borderRadius: 14,
-    marginRight: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#E2E9F3",
-  },
-  activeCategory: {
-    backgroundColor: "#1769E0",
-    borderColor: "#1769E0",
-  },
-  categoryEmoji: {
-    fontSize: 16,
-    marginRight: 7,
-  },
-  categoryText: {
-    color: "#53647C",
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  activeCategoryText: {
-    color: "#FFFFFF",
-    fontSize: 12,
-    fontWeight: "700",
-  },
-  noteCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 17,
-    padding: 17,
-    marginBottom: 13,
-    borderWidth: 1,
-    borderColor: "#E7EDF6",
-    elevation: 2,
-  },
-  noteTop: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  subjectBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-  },
-  subjectText: {
-    color: "#1769E0",
-    fontSize: 11,
-    fontWeight: "800",
-  },
-  more: {
-    color: "#8A9AB5",
-    fontWeight: "800",
-    letterSpacing: 2,
-  },
-  noteTitle: {
-    color: "#172B4D",
-    fontSize: 17,
-    fontWeight: "800",
-    marginTop: 13,
-    marginBottom: 7,
-  },
-  noteDescription: {
-    color: "#687991",
-    fontSize: 13,
-    lineHeight: 20,
-  },
-  noteBottom: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 16,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: "#EDF1F6",
-  },
-  date: {
-    color: "#8997AB",
-    fontSize: 11,
-  },
-  openNote: {
-    color: "#1769E0",
-    fontSize: 12,
-    fontWeight: "800",
-  },
-  progressCard: {
-    backgroundColor: "#1769E0",
-    borderRadius: 18,
-    padding: 18,
-    marginTop: 7,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  progressInfo: {
+    fontWeight: 'bold',
+    color: '#212529',
     flex: 1,
-    paddingRight: 8,
   },
-  progressLabel: {
-    color: "#BFD8FF",
-    fontSize: 9,
-    fontWeight: "800",
-    letterSpacing: 1,
+  badge: {
+    backgroundColor: '#FFE8D6',
+    color: '#E85D04',
+    fontSize: 12,
+    fontWeight: '600',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+    overflow: 'hidden',
   },
-  progressTitle: {
-    color: "#FFFFFF",
+  cardDescription: {
+    fontSize: 14,
+    color: '#495057',
+    marginBottom: 12,
+    lineHeight: 18,
+  },
+  cardFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  cardMeta: {
+    fontSize: 13,
+    color: '#6C757D',
+  },
+  viewLink: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#E85D04',
+  },
+  detailPadding: {
+    padding: 20,
+  },
+  detailTitle: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#212529',
+    marginBottom: 10,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    gap: 12,
+  },
+  detailMetaText: {
+    fontSize: 14,
+    color: '#6C757D',
+  },
+  sectionHeader: {
     fontSize: 18,
-    fontWeight: "800",
-    marginTop: 5,
+    fontWeight: 'bold',
+    color: '#212529',
+    marginTop: 10,
+    marginBottom: 8,
   },
-  progressDescription: {
-    color: "#D9E9FF",
-    fontSize: 11,
-    marginTop: 5,
+  detailDescription: {
+    fontSize: 15,
+    color: '#495057',
+    lineHeight: 22,
+    marginBottom: 16,
   },
-  progressCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    borderWidth: 5,
-    borderColor: "#FFFFFF",
-    justifyContent: "center",
-    alignItems: "center",
+  ingredientsBox: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E9ECEF',
+    marginBottom: 24,
   },
-  progressNumber: {
-    color: "#FFFFFF",
-    fontSize: 13,
-    fontWeight: "800",
+  ingredientItem: {
+    fontSize: 15,
+    color: '#212529',
+    marginBottom: 8,
   },
-  addButton: {
-    position: "absolute",
-    right: 20,
-    bottom: 78,
-    backgroundColor: "#1769E0",
-    borderRadius: 28,
-    height: 52,
-    paddingHorizontal: 19,
-    flexDirection: "row",
-    alignItems: "center",
-    elevation: 6,
+  backButton: {
+    backgroundColor: '#6C757D',
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: 'center',
   },
-  addIcon: {
-    color: "#FFFFFF",
-    fontSize: 25,
-    marginRight: 7,
-    marginTop: -2,
-  },
-  addText: {
-    color: "#FFFFFF",
-    fontSize: 13,
-    fontWeight: "800",
-  },
-  bottomNav: {
-    height: 65,
-    backgroundColor: "#FFFFFF",
-    borderTopWidth: 1,
-    borderTopColor: "#E5EAF2",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-  },
-  navItem: {
-    alignItems: "center",
-    justifyContent: "center",
-    width: 70,
-  },
-  navIcon: {
-    color: "#94A2B7",
-    fontSize: 19,
-    marginBottom: 3,
-  },
-  navIconActive: {
-    color: "#1769E0",
-    fontSize: 20,
-    marginBottom: 3,
-  },
-  navText: {
-    color: "#94A2B7",
-    fontSize: 10,
-  },
-  navTextActive: {
-    color: "#1769E0",
-    fontSize: 10,
-    fontWeight: "800",
+  backButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
