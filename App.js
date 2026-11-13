@@ -1,386 +1,501 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  SafeAreaView,
   View,
   Text,
-  FlatList,
+  TextInput,
   TouchableOpacity,
+  FlatList,
   StyleSheet,
-  StatusBar,
-  ScrollView,
 } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
-// ==========================================
-// 1. HARDCODED MOCK DATA
-// ==========================================
-const RECIPES_DATA = [
-  {
-    id: '1',
-    name: 'Chicken Adobo',
-    category: 'Filipino',
-    prepTime: '45 mins',
-    servings: 4,
-    description: 'A savory Filipino classic dish braised in soy sauce, vinegar, garlic, and black pepper.',
-    ingredients: [
-      '1 kg Chicken thighs',
-      '1/2 cup Soy sauce',
-      '1/2 cup Vinegar',
-      '5 cloves Garlic, crushed',
-      '2 Bay leaves',
-      '1 tsp Whole black peppercorns',
-    ],
-  },
-  {
-    id: '2',
-    name: 'Garlic Butter Shrimp',
-    category: 'Seafood',
-    prepTime: '20 mins',
-    servings: 2,
-    description: 'Quick and rich shrimp sautéed in minced garlic, melted butter, and fresh lemon juice.',
-    ingredients: [
-      '500g Large shrimp, peeled',
-      '1/2 cup Unsalted butter',
-      '1 head Garlic, minced',
-      '1 tbsp Lemon juice',
-      'Fresh parsley, chopped',
-    ],
-  },
-  {
-    id: '3',
-    name: 'Spaghetti Carbonara',
-    category: 'Italian',
-    prepTime: '25 mins',
-    servings: 3,
-    description: 'Authentic Roman pasta prepared with crispy pancetta, fresh egg yolks, Pecorino Romano, and black pepper.',
-    ingredients: [
-      '350g Spaghetti',
-      '150g Pancetta or Guanciale',
-      '3 Large egg yolks',
-      '1 cup Pecorino Romano cheese',
-      'Freshly ground black pepper',
-    ],
-  },
-];
-
-// ==========================================
-// 2. SCREEN 1: HOME SCREEN
-// ==========================================
-function HomeScreen({ navigation }) {
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.centerContent}>
-        <Text style={styles.homeEmoji}>🍳</Text>
-        <Text style={styles.homeTitle}>Recipe Book</Text>
-        <Text style={styles.homeSubtitle}>
-          Discover delicious home-cooked meals and step-by-step guides.
-        </Text>
-
-        <TouchableOpacity
-          style={styles.primaryButton}
-          onPress={() => navigation.navigate('RecipeList')}
-        >
-          <Text style={styles.primaryButtonText}>View All Recipes →</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
-  );
-}
-
-// ==========================================
-// 3. SCREEN 2: RECIPE CATALOG / LIST SCREEN
-// ==========================================
-function RecipeListScreen({ navigation }) {
-  const renderRecipeCard = ({ item }) => (
-    <TouchableOpacity
-      style={styles.card}
-      activeOpacity={0.8}
-      onPress={() =>
-        // Passing data object to Detail Screen via route.params
-        navigation.navigate('RecipeDetail', { recipe: item })
-      }
-    >
-      <View style={styles.cardHeader}>
-        <Text style={styles.cardTitle}>{item.name}</Text>
-        <Text style={styles.badge}>{item.category}</Text>
-      </View>
-
-      <Text style={styles.cardDescription} numberOfLines={2}>
-        {item.description}
-      </Text>
-
-      <View style={styles.cardFooter}>
-        <Text style={styles.cardMeta}>⏱️ {item.prepTime}</Text>
-        <Text style={styles.cardMeta}>🍽️ {item.servings} Servings</Text>
-        <Text style={styles.viewLink}>View Details →</Text>
-      </View>
-    </TouchableOpacity>
-  );
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.sectionTitle}>Recipe Collection</Text>
-        <Text style={styles.sectionSubtitle}>Tap any recipe to view full ingredients</Text>
-      </View>
-
-      <FlatList
-        data={RECIPES_DATA}
-        keyExtractor={(item) => item.id}
-        renderItem={renderRecipeCard}
-        contentContainerStyle={styles.listPadding}
-      />
-    </SafeAreaView>
-  );
-}
-
-// ==========================================
-// 4. SCREEN 3: ITEM DETAILS SCREEN
-// ==========================================
-function RecipeDetailScreen({ route, navigation }) {
-  // Receiving the recipe parameters passed from RecipeListScreen
-  const { recipe } = route.params;
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.detailPadding}>
-        <Text style={styles.detailTitle}>{recipe.name}</Text>
-        
-        <View style={styles.metaRow}>
-          <Text style={styles.badge}>{recipe.category}</Text>
-          <Text style={styles.detailMetaText}>⏱️ {recipe.prepTime}</Text>
-          <Text style={styles.detailMetaText}>🍽️ {recipe.servings} Servings</Text>
-        </View>
-
-        <Text style={styles.sectionHeader}>Description</Text>
-        <Text style={styles.detailDescription}>{recipe.description}</Text>
-
-        <Text style={styles.sectionHeader}>Ingredients</Text>
-        <View style={styles.ingredientsBox}>
-          {recipe.ingredients.map((ingredient, index) => (
-            <Text key={index} style={styles.ingredientItem}>
-              •  {ingredient}
-            </Text>
-          ))}
-        </View>
-
-        {/* Custom Go Back Button demonstrating navigation.goBack() */}
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backButtonText}>← Go Back to Collection</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
-
-// ==========================================
-// 5. STACK NAVIGATOR CONFIGURATION
-// ==========================================
-const Stack = createNativeStackNavigator();
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function App() {
-  return (
-    <NavigationContainer>
-      <StatusBar barStyle="dark-content" />
-      <Stack.Navigator
-        initialRouteName="Home"
-        screenOptions={{
-          headerTintColor: '#E85D04',
-          headerTitleStyle: { fontWeight: 'bold' },
-        }}
+  const [tasks, setTasks] = useState([]);
+  const [inputText, setInputText] = useState('');
+
+  const addTask = () => {
+    if (inputText.trim() === '') {
+      return;
+    }
+
+    const newTask = {
+      id: Date.now().toString(),
+      title: inputText.trim(),
+      completed: false,
+    };
+
+    setTasks([...tasks, newTask]);
+    setInputText('');
+  };
+
+  const toggleTask = (id) => {
+    setTasks(
+      tasks.map((task) =>
+        task.id === id
+          ? { ...task, completed: !task.completed }
+          : task
+      )
+    );
+  };
+
+  const deleteTask = (id) => {
+    setTasks(
+      tasks.filter((task) => task.id !== id)
+    );
+  };
+
+  const completedTasks = tasks.filter(
+    (task) => task.completed
+  ).length;
+
+  const renderTask = ({ item }) => (
+    <View
+      style={[
+        styles.taskCard,
+        item.completed && styles.completedCard,
+      ]}
+    >
+      <TouchableOpacity
+        style={[
+          styles.checkButton,
+          item.completed && styles.checkedButton,
+        ]}
+        onPress={() => toggleTask(item.id)}
       >
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{ title: 'Welcome' }}
-        />
-        <Stack.Screen
-          name="RecipeList"
-          component={RecipeListScreen}
-          options={{ title: 'Recipes' }}
-        />
-        <Stack.Screen
-          name="RecipeDetail"
-          component={RecipeDetailScreen}
-          options={({ route }) => ({
-            title: route.params?.recipe?.name || 'Recipe Details',
-          })}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+        {item.completed && (
+          <Text style={styles.checkmark}>✓</Text>
+        )}
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.taskContent}
+        onPress={() => toggleTask(item.id)}
+      >
+        <Text
+          style={[
+            styles.taskText,
+            item.completed && styles.completedText,
+          ]}
+        >
+          {item.title}
+        </Text>
+
+        <Text style={styles.taskStatus}>
+          {item.completed ? 'Completed' : 'Tap to complete'}
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={() => deleteTask(item.id)}
+      >
+        <Text style={styles.deleteText}>×</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  return (
+    <SafeAreaView style={styles.container}>
+
+      {/* Header */}
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.greeting}>
+            MY TASKS
+          </Text>
+
+          <Text style={styles.title}>
+            To-Do List
+          </Text>
+
+          <Text style={styles.subtitle}>
+            Stay organized and get things done.
+          </Text>
+        </View>
+
+        <View style={styles.headerIcon}>
+          <Text style={styles.headerIconText}>✓</Text>
+        </View>
+      </View>
+
+      {/* Statistics */}
+      <View style={styles.statsContainer}>
+
+        <View style={styles.statCard}>
+          <Text style={styles.statNumber}>
+            {tasks.length}
+          </Text>
+
+          <Text style={styles.statLabel}>
+            Total
+          </Text>
+        </View>
+
+        <View style={styles.statCard}>
+          <Text style={styles.statNumber}>
+            {completedTasks}
+          </Text>
+
+          <Text style={styles.statLabel}>
+            Done
+          </Text>
+        </View>
+
+        <View style={styles.statCard}>
+          <Text style={styles.statNumber}>
+            {tasks.length - completedTasks}
+          </Text>
+
+          <Text style={styles.statLabel}>
+            Pending
+          </Text>
+        </View>
+
+      </View>
+
+      {/* Add Task */}
+      <View style={styles.addSection}>
+        <Text style={styles.sectionTitle}>
+          Add a new task
+        </Text>
+
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="What needs to be done?"
+            placeholderTextColor="#A0A0A0"
+            value={inputText}
+            onChangeText={setInputText}
+            onSubmitEditing={addTask}
+          />
+
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={addTask}
+          >
+            <Text style={styles.addButtonText}>
+              +
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Task Section */}
+      <View style={styles.listHeader}>
+        <Text style={styles.listTitle}>
+          Your Tasks
+        </Text>
+
+        <Text style={styles.taskCount}>
+          {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}
+        </Text>
+      </View>
+
+      {/* Task List */}
+      <FlatList
+        data={tasks}
+        keyExtractor={(item) => item.id}
+        renderItem={renderTask}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={
+          tasks.length === 0
+            ? styles.emptyList
+            : styles.list
+        }
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <View style={styles.emptyIcon}>
+              <Text style={styles.emptyIconText}>
+                ✓
+              </Text>
+            </View>
+
+            <Text style={styles.emptyTitle}>
+              No tasks yet
+            </Text>
+
+            <Text style={styles.emptyText}>
+              Add your first task above and start
+              organizing your day.
+            </Text>
+          </View>
+        }
+      />
+
+    </SafeAreaView>
   );
 }
 
-// ==========================================
-// 6. STYLES
-// ==========================================
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#F6F7FB',
+    paddingHorizontal: 20,
   },
-  centerContent: {
-    flex: 1,
+
+  /* HEADER */
+
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 15,
+    paddingBottom: 20,
+  },
+
+  greeting: {
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 2,
+    color: '#6C63FF',
+    marginBottom: 5,
+  },
+
+  title: {
+    fontSize: 34,
+    fontWeight: '800',
+    color: '#1D1D2B',
+  },
+
+  subtitle: {
+    fontSize: 14,
+    color: '#858592',
+    marginTop: 5,
+  },
+
+  headerIcon: {
+    width: 52,
+    height: 52,
+    borderRadius: 18,
+    backgroundColor: '#0edcebf3',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 24,
   },
-  homeEmoji: {
-    fontSize: 64,
-    marginBottom: 16,
-  },
-  homeTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#212529',
-    marginBottom: 8,
-  },
-  homeSubtitle: {
-    fontSize: 16,
-    color: '#6C757D',
-    textAlign: 'center',
-    marginBottom: 32,
-    lineHeight: 22,
-  },
-  primaryButton: {
-    backgroundColor: '#E85D04',
-    paddingVertical: 14,
-    paddingHorizontal: 28,
-    borderRadius: 10,
-    elevation: 2,
-  },
-  primaryButtonText: {
+
+  headerIconText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 25,
     fontWeight: 'bold',
   },
-  headerContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#212529',
-  },
-  sectionSubtitle: {
-    fontSize: 14,
-    color: '#6C757D',
-    marginTop: 2,
-  },
-  listPadding: {
-    padding: 16,
-  },
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: '#E9ECEF',
-    elevation: 1,
-  },
-  cardHeader: {
+
+  /* STATISTICS */
+
+  statsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 6,
+    gap: 12,
+    marginBottom: 25,
   },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#212529',
+
+  statCard: {
     flex: 1,
-  },
-  badge: {
-    backgroundColor: '#FFE8D6',
-    color: '#E85D04',
-    fontSize: 12,
-    fontWeight: '600',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 6,
-    overflow: 'hidden',
-  },
-  cardDescription: {
-    fontSize: 14,
-    color: '#495057',
-    marginBottom: 12,
-    lineHeight: 18,
-  },
-  cardFooter: {
-    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    paddingVertical: 16,
     alignItems: 'center',
-    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: '#ECECF3',
   },
-  cardMeta: {
-    fontSize: 13,
-    color: '#6C757D',
+
+  statNumber: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#1D1D2B',
   },
-  viewLink: {
-    fontSize: 13,
-    fontWeight: 'bold',
-    color: '#E85D04',
+
+  statLabel: {
+    fontSize: 12,
+    color: '#858592',
+    marginTop: 3,
   },
-  detailPadding: {
-    padding: 20,
+
+  /* ADD TASK */
+
+  addSection: {
+    marginBottom: 25,
   },
-  detailTitle: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#212529',
+
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#2183bb',
     marginBottom: 10,
   },
-  metaRow: {
+
+  inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
-    gap: 12,
-  },
-  detailMetaText: {
-    fontSize: 14,
-    color: '#6C757D',
-  },
-  sectionHeader: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#212529',
-    marginTop: 10,
-    marginBottom: 8,
-  },
-  detailDescription: {
-    fontSize: 15,
-    color: '#495057',
-    lineHeight: 22,
-    marginBottom: 16,
-  },
-  ingredientsBox: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-    padding: 16,
+    borderRadius: 16,
+    padding: 6,
     borderWidth: 1,
-    borderColor: '#E9ECEF',
-    marginBottom: 24,
+    borderColor: '#E7E7EF',
   },
-  ingredientItem: {
+
+  input: {
+    flex: 1,
+    height: 48,
+    paddingHorizontal: 14,
     fontSize: 15,
-    color: '#212529',
-    marginBottom: 8,
+    color: '#128999',
   },
-  backButton: {
-    backgroundColor: '#6C757D',
-    paddingVertical: 14,
-    borderRadius: 10,
+
+  addButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 13,
+    backgroundColor: '#1da2b9',
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  backButtonText: {
+
+  addButtonText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 30,
+    fontWeight: '300',
+    lineHeight: 32,
+  },
+
+  /* LIST HEADER */
+
+  listHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+
+  listTitle: {
+    fontSize: 19,
+    fontWeight: '800',
+    color: '#292936',
+  },
+
+  taskCount: {
+    fontSize: 13,
+    color: '#858592',
+  },
+
+  /* TASK CARD */
+
+  list: {
+    paddingBottom: 30,
+  },
+
+  taskCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    padding: 15,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#ECECF3',
+  },
+
+  completedCard: {
+    opacity: 0.75,
+  },
+
+  checkButton: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: '#D4D4DF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 13,
+  },
+
+  checkedButton: {
+    backgroundColor: '#16b2c7',
+    borderColor: '#0b8bb3',
+  },
+
+  checkmark: {
+    color: '#FFFFFF',
+    fontSize: 17,
     fontWeight: 'bold',
+  },
+
+  taskContent: {
+    flex: 1,
+  },
+
+  taskText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#0cd8d8',
+  },
+
+  completedText: {
+    textDecorationLine: 'line-through',
+    color: '#9999A5',
+  },
+
+  taskStatus: {
+    fontSize: 11,
+    color: '#9999A5',
+    marginTop: 4,
+  },
+
+  deleteButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    backgroundColor: '#FFF0F0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10,
+  },
+
+  deleteText: {
+    fontSize: 22,
+    color: '#E85D5D',
+    fontWeight: '400',
+  },
+
+  /* EMPTY STATE */
+
+  emptyList: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom: 80,
+  },
+
+  emptyContainer: {
+    alignItems: 'center',
+    paddingHorizontal: 30,
+  },
+
+  emptyIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 25,
+    backgroundColor: '#EDEBFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 18,
+  },
+
+  emptyIconText: {
+    fontSize: 38,
+    color: '#6C63FF',
+    fontWeight: 'bold',
+  },
+
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#292936',
+    marginBottom: 7,
+  },
+
+  emptyText: {
+    fontSize: 14,
+    lineHeight: 21,
+    color: '#9999A5',
+    textAlign: 'center',
   },
 });
