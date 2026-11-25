@@ -1,0 +1,14 @@
+﻿
+{
+  "expo": {
+    "name": "NotesTodoApp",
+    "slug": "notestodoapp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "platforms": [
+      "android",
+      "web"
+    ]
+  }
+}
